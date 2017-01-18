@@ -1,0 +1,113 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'publish' ]
+2 info using npm@4.0.2
+3 info using node@v4.6.0
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   escapedName: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: 'C:\\Users\\kasasae\\WebstormProjects\\react-listgrid',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory C:\Users\kasasae\AppData\Roaming\npm-cache\react-listgrid\1.0.0\package.tgz not in flight; packing
+9 verbose correctMkdir C:\Users\kasasae\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+10 info lifecycle react-listgrid@1.0.0~prepublish: react-listgrid@1.0.0
+11 silly lifecycle react-listgrid@1.0.0~prepublish: no script for prepublish, continuing
+12 info lifecycle react-listgrid@1.0.0~prepare: react-listgrid@1.0.0
+13 silly lifecycle react-listgrid@1.0.0~prepare: no script for prepare, continuing
+14 verbose tar pack [ 'C:\\Users\\kasasae\\AppData\\Roaming\\npm-cache\\react-listgrid\\1.0.0\\package.tgz',
+14 verbose tar pack   'C:\\Users\\kasasae\\WebstormProjects\\react-listgrid' ]
+15 verbose tarball C:\Users\kasasae\AppData\Roaming\npm-cache\react-listgrid\1.0.0\package.tgz
+16 verbose folder C:\Users\kasasae\WebstormProjects\react-listgrid
+17 verbose addLocalTarball adding from inside cache C:\Users\kasasae\AppData\Roaming\npm-cache\react-listgrid\1.0.0\package.tgz
+18 verbose correctMkdir C:\Users\kasasae\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+19 silly cache afterAdd react-listgrid@1.0.0
+20 verbose afterAdd C:\Users\kasasae\AppData\Roaming\npm-cache\react-listgrid\1.0.0\package\package.json not in flight; writing
+21 verbose correctMkdir C:\Users\kasasae\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+22 verbose afterAdd C:\Users\kasasae\AppData\Roaming\npm-cache\react-listgrid\1.0.0\package\package.json written
+23 silly publish { name: 'react-listgrid',
+23 silly publish   version: '1.0.0',
+23 silly publish   description: 'List Grid in React',
+23 silly publish   main: 'index.js',
+23 silly publish   scripts: { test: 'echo "Error: no test specified" && exit 1' },
+23 silly publish   repository:
+23 silly publish    { type: 'git',
+23 silly publish      url: 'git+https://github.com/ekastimo/react-listgrid.git' },
+23 silly publish   keywords: [ 'React', 'bootstrap', 'grid', 'Data' ],
+23 silly publish   author: { name: 'Timothy Kasasa E', email: 'ekastimo@gmail.com' },
+23 silly publish   license: 'ISC',
+23 silly publish   bugs: { url: 'https://github.com/ekastimo/react-listgrid/issues' },
+23 silly publish   homepage: 'https://github.com/ekastimo/react-listgrid#readme',
+23 silly publish   readme: '# react-listgrid\r\nList grid/ Data Grid implementation using react and Bootstrap\r\n',
+23 silly publish   readmeFilename: 'README.md',
+23 silly publish   gitHead: '28f2f20ea8eda41e467d329b351ee2fd0d66f2db',
+23 silly publish   _id: 'react-listgrid@1.0.0',
+23 silly publish   _shasum: '444124680750c96c3d6f7e3ce1d5168aef2ccafe',
+23 silly publish   _from: '.' }
+24 info lifecycle react-listgrid@1.0.0~prepublishOnly: react-listgrid@1.0.0
+25 silly lifecycle react-listgrid@1.0.0~prepublishOnly: no script for prepublishOnly, continuing
+26 verbose getPublishConfig undefined
+27 silly mapToRegistry name react-listgrid
+28 silly mapToRegistry using default registry
+29 silly mapToRegistry registry https://registry.npmjs.org/
+30 silly mapToRegistry data Result {
+30 silly mapToRegistry   raw: 'react-listgrid',
+30 silly mapToRegistry   scope: null,
+30 silly mapToRegistry   escapedName: 'react-listgrid',
+30 silly mapToRegistry   name: 'react-listgrid',
+30 silly mapToRegistry   rawSpec: '',
+30 silly mapToRegistry   spec: 'latest',
+30 silly mapToRegistry   type: 'tag' }
+31 silly mapToRegistry uri https://registry.npmjs.org/react-listgrid
+32 verbose publish registryBase https://registry.npmjs.org/
+33 silly publish uploading C:\Users\kasasae\AppData\Roaming\npm-cache\react-listgrid\1.0.0\package.tgz
+34 verbose request uri https://registry.npmjs.org/react-listgrid
+35 verbose request sending authorization for write operation
+36 info attempt registry request try #1 at 2:54:29 PM
+37 verbose request using bearer token for auth
+38 verbose request id 8fe93c8bab3a3345
+39 http request PUT https://registry.npmjs.org/react-listgrid
+40 http 403 https://registry.npmjs.org/react-listgrid
+41 verbose headers { 'content-type': 'application/json',
+41 verbose headers   'cache-control': 'max-age=300',
+41 verbose headers   'content-length': '128',
+41 verbose headers   'accept-ranges': 'bytes',
+41 verbose headers   date: 'Wed, 18 Jan 2017 11:52:27 GMT',
+41 verbose headers   via: '1.1 varnish',
+41 verbose headers   connection: 'close',
+41 verbose headers   'x-served-by': 'cache-ams4134-AMS',
+41 verbose headers   'x-cache': 'MISS',
+41 verbose headers   'x-cache-hits': '0',
+41 verbose headers   'x-timer': 'S1484740345.520105,VS0,VE1495',
+41 verbose headers   vary: 'Accept-Encoding' }
+42 verbose request invalidating C:\Users\kasasae\AppData\Roaming\npm-cache\registry.npmjs.org\react-listgrid on PUT
+43 error publish Failed PUT 403
+44 verbose stack Error: "You cannot publish over the previously published version 1.0.0. Try bumping the version to 2.0.0" : react-listgrid
+44 verbose stack     at makeError (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:302:12)
+44 verbose stack     at CachingRegistryClient.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:290:14)
+44 verbose stack     at Request._callback (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:210:14)
+44 verbose stack     at Request.self.callback (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:186:22)
+44 verbose stack     at emitTwo (events.js:87:13)
+44 verbose stack     at Request.emit (events.js:172:7)
+44 verbose stack     at Request.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:1081:10)
+44 verbose stack     at emitOne (events.js:77:13)
+44 verbose stack     at Request.emit (events.js:169:7)
+44 verbose stack     at IncomingMessage.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:1001:12)
+45 verbose statusCode 403
+46 verbose pkgid react-listgrid
+47 verbose cwd C:\Users\kasasae\WebstormProjects\react-listgrid
+48 error Windows_NT 10.0.14393
+49 error argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "publish"
+50 error node v4.6.0
+51 error npm  v4.0.2
+52 error code E403
+53 error "You cannot publish over the previously published version 1.0.0. Try bumping the version to 2.0.0" : react-listgrid
+54 error If you need help, you may report this error at:
+54 error     <https://github.com/npm/npm/issues>
+55 verbose exit [ 1, true ]

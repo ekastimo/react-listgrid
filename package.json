@@ -1,14 +1,22 @@
 {
   "name": "react-listgrid",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "List Grid in React",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekastimo/react-listgrid.git"
+  },
   "keywords": [
-    "React"
+    "React","bootstrap","grid","Data"
   ],
-  "author": "Timothy Emmanuel Kasasa",
-  "license": "ISC"
+  "author": "Timothy Kasasa E <ekastimo@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ekastimo/react-listgrid/issues"
+  },
+  "homepage": "https://github.com/ekastimo/react-listgrid#readme"
 }
