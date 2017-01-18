@@ -1,0 +1,14 @@
+{
+  "name": "react-listgrid",
+  "version": "1.0.0",
+  "description": "List Grid in React",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "React"
+  ],
+  "author": "Timothy Emmanuel Kasasa",
+  "license": "ISC"
+}
