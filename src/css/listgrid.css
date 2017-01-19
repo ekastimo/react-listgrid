@@ -1,0 +1,25 @@
+.listgrid-row-selected{
+    background-color: #ddd1e7;
+    border-bottom: 1px solid #ccbadc;
+}
+
+.listgrid-check-box{
+    width: 40px;
+}
+
+.listgrid-filter-item{
+    width: 90%;
+    height: 20px;
+    border-radius: 3px;
+}
+
+.listgrid-filter-item{
+    width: 90%;
+    height: 20px;
+    border-radius: 3px;
+}
+
+.pagination{
+    margin: 0;
+    float: right;
+}

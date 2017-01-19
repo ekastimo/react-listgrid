@@ -11,12 +11,39 @@
     "url": "git+https://github.com/ekastimo/react-listgrid.git"
   },
   "keywords": [
-    "React","bootstrap","grid","Data"
+    "React",
+    "bootstrap",
+    "grid",
+    "Data"
   ],
   "author": "Timothy Kasasa E <ekastimo@gmail.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ekastimo/react-listgrid/issues"
   },
-  "homepage": "https://github.com/ekastimo/react-listgrid#readme"
+  "homepage": "https://github.com/ekastimo/react-listgrid#readme",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-js-pagination": "^2.0.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.18.0",
+    "babel-loader": "^6.2.5",
+    "babel-plugin-add-module-exports": "^0.1.2",
+    "babel-plugin-react-html-attrs": "^2.0.0",
+    "babel-plugin-transform-class-properties": "^6.3.13",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-0": "^6.3.13",
+    "babel-runtime": "^6.11.6",
+    "css-loader": "^0.25.0",
+    "file-loader": "^0.9.0",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.16.2"
+  }
 }
