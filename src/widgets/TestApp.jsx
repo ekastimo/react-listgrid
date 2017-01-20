@@ -2,7 +2,7 @@ import React from "react";
 import {render} from "react-dom";
 import "bootstrap/dist/css/bootstrap.css";
 import "../css/listgrid.css";
-import ListGrid0 from "./ListGrid0.jsx"
+import ListGrid from "./ListGrid.jsx"
 import DATA from "../utils/DataCache.jsx"
 export default class TestApp extends React.Component {
     constructor(props) {
@@ -12,7 +12,6 @@ export default class TestApp extends React.Component {
             tableData: [...DATA.tableData]
         };
         this.dataGrid = undefined;
-        console.log("Width.....",DATA.getSrollbarWidth())
     }
 
     createButtons() {
@@ -85,7 +84,7 @@ export default class TestApp extends React.Component {
                 height: "100%",
                 padding: 5,
             }}>
-                <ListGrid0
+                <ListGrid
                     config={this.state.tableConfig}
                     data={this.state.tableData}
                     controls={this.createButtons()}

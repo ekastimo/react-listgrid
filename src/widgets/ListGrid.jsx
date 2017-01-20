@@ -1,6 +1,44 @@
 import React from 'react';
-import dataCache  from "../utils/DataCache.jsx";
 import Pagination from "react-js-pagination";
+
+const getScrollBarWidth = function () {
+    // Create the measurement node
+    let scrollDiv = document.createElement("div");
+    scrollDiv.style.width = '100px';
+    scrollDiv.style.height = '100px';
+    scrollDiv.style.overflow = 'scroll';
+    scrollDiv.style.position = 'absolute';
+    scrollDiv.style.top = '-9999px';
+    document.body.appendChild(scrollDiv);
+    // Get the scrollbar width
+    let scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+    // Delete the DIV
+    document.body.removeChild(scrollDiv);
+    return scrollbarWidth;
+};
+const scrollBarW = getScrollBarWidth();
+const styles = {
+    checkBox: {
+        width: '40px'
+    },
+    rowSelected: {
+        backgroundColor: '#ddd1e7'
+    },
+    thead_tbody_tr: {
+        display: 'table',
+        width: '100%',
+        tableLayout: 'fixed'
+    },
+    thead: {
+        width: 'calc( 100% - '+scrollBarW+'px )',
+        overflow: 'scroll'
+    },
+    tbody: {
+        display: 'block',
+        height: '200px',
+        overflowY: 'scroll'
+    }
+};
 
 export default class ListGrid extends React.Component {
     constructor(props) {
@@ -12,68 +50,54 @@ export default class ListGrid extends React.Component {
             return col.showOnGrid
         });
         //Local to List grid
-        this.selectedData = {};
+        /**
+         * Store Ids of the selected Data
+         * @type {{}}
+         */
         this.criteria = {};
-
+        this.isPaged = this.props.isPaged || false;
         this.state = {
             itemsCountPerPage: 10,
-            isRowsSelected: false,
+            allRowsSelected: false,
             displayData: [...this.rawData],
-            sortDir: null,//ASC/DESC
-            sortBy: null,
-            currentPage: 1
+            selectedData: {},
+            sortDir: "ASC",//ASC/DESC
+            sortBy: this.primaryKey,
+            currentPage: 1,
+            showFilter: true
         };
     }
 
     componentWillReceiveProps(props) {
         if (props.tableConfig) {
-            this.selectedData = {};
             this.rawData = props.tableData;
-            this.setState({displayData: this.rawData.slice(0)});
+            let displayData = [...this.rawData];
+            this.setState({displayData: displayData, selectedData: {}});
         }
     }
 
-    refresh() {
-        //TODO Implement refresh
-    }
-
-    addRecord(rec) {
-        console.log("Adding New Record>>");
-        console.log(rec);
-        this.refresh();
-    }
-
-    handleRowsSelect(event) {
-        this.onRowsSelectionStateChange(!this.state.isRowsSelected);
-        this.setState({isRowsSelected: !this.state.isRowsSelected});
-    }
-
-    onRowsSelectionStateChange(selected) {
-        const displayData = this.getDisplayData();
+    onSelectAllRows(selected) {
         if (selected) {
-            displayData.forEach((rec) => {
-                this.selectedData[rec[this.primaryKey]] = rec;
+            const selectedData = {};
+            this.state.displayData.forEach(rec => {
+                let pk = rec[this.primaryKey];
+                selectedData[pk] = true;
             });
+            this.setState({selectedData: selectedData});
         } else {
-            displayData.forEach((rec) => {
-                delete this.selectedData[rec[this.primaryKey]];
-            });
+            this.setState({selectedData: {}});
         }
     }
 
-    /**
-     * Sort Only the displayed Data
-     * @param colName
-     */
-    onSort(colName) {
-        let sortDir = this.state.sortDir;
-        const sortBy = colName;
-        if (sortBy === this.state.sortBy) {
-            sortDir = this.state.sortDir === 'ASC' ? 'DESC' : 'ASC';
-        } else {
-            sortDir = 'DESC';
-        }
-        const rows = [...this.state.displayData];
+    onSelectOneRow(selected, rowPk) {
+        const selectedData = {...this.state.selectedData};
+        selectedData[rowPk] = selected;
+        this.setState({selectedData: selectedData});
+    }
+
+
+    sortData(rows, sortBy, sortDir) {
+        console.log("Sorting...", sortBy + " " + sortDir);
         rows.sort((a, b) => {
             let sortVal = 0;
             if (a[sortBy] > b[sortBy]) {
@@ -88,14 +112,27 @@ export default class ListGrid extends React.Component {
             }
             return sortVal;
         });
-
-        this.setState({sortBy, sortDir, displayData: rows});
+        return rows;
     }
 
-    onFilter(colName, event) {
-        const criteria = this.criteria;
-        criteria[colName] = event.target.value.toString().toLowerCase();
-        console.log(criteria);
+    /**
+     * Sort Only the displayed Data
+     * @param colName
+     */
+    onSort(colName) {
+        let sortDir = this.state.sortDir;
+        const sortBy = colName;
+        if (sortBy === this.state.sortBy) {
+            sortDir = this.state.sortDir === 'ASC' ? 'DESC' : 'ASC';
+        } else {
+            sortDir = 'DESC';
+        }
+        let sortedData = this.sortData(this.state.displayData, sortBy, sortDir);
+        this.setState({sortBy, sortDir, displayData: sortedData});
+    }
+
+    filterData(criteria) {
+        console.log("Filtering..", criteria);
         const size = this.rawData.length;
         const filteredList = [];
         for (let index = 0; index < size; index++) {
@@ -109,11 +146,16 @@ export default class ListGrid extends React.Component {
                 filteredList.push(this.rawData[index]);
             }
         }
-        //On filter set Current Page to One To avoid too large page Number
-        this.setState({
-            currentPage: 1,
-            displayData: filteredList,
-        });
+        return filteredList;
+    }
+
+    onFilter(colName, event) {
+        const criteria = this.criteria;
+        criteria[colName] = event.target.value.toString().toLowerCase();
+        const size = this.rawData.length;
+        const filteredList = this.filterData(criteria);
+        //On filter set Current Page to 1 lest records disappear
+        this.setState({currentPage: 1, displayData: filteredList});
     }
 
     onPagerChanged(page) {
@@ -122,7 +164,10 @@ export default class ListGrid extends React.Component {
         });
     }
 
-    getDisplayData() {
+    getPagedData() {
+        if (!this.isPaged) {
+            return this.state.displayData;
+        }
         const end = this.state.itemsCountPerPage * this.state.currentPage;
         const start = end - this.state.itemsCountPerPage;
         const pageData = [];
@@ -133,83 +178,117 @@ export default class ListGrid extends React.Component {
         return pageData;
     }
 
-    rowSelectedHandler(data) {
-        this.selectedData[data[this.primaryKey]] = data;
+    createTableHead() {
+        return (
+            <thead style={{...styles.thead_tbody_tr,...styles.thead}}>
+            <tr style={{
+                ...styles.thead_tbody_tr,
+                background: '#ebebeb'
+            }}>
+
+                <th style={styles.checkBox}>
+                    <CheckBox onValueChanged={this.onSelectAllRows.bind(this)}/>
+                </th>
+
+                {this.columns.map((col) => {
+                    let sortDirArrow = <span >&nbsp;&nbsp;</span>;
+                    if (this.state.sortBy === col.name && this.state.sortDir !== null) {
+                        sortDirArrow = (this.state.sortDir === 'DESC')
+                            ? <span className="glyphicon glyphicon-arrow-down"/>
+                            : <span className="glyphicon glyphicon-arrow-up"/>;
+                    }
+                    return (
+                        <th key={col.name} className="listgrid-body-cell">
+                                <span style={{width: 100}} onClick={() => this.onSort(col.name)}>
+                                    {col.title }{sortDirArrow}
+                                </span>
+                            {
+                                this.state.showFilter &&
+                                <div>
+                                    <input style={{
+                                        width: '90%',
+                                        height: '25px',
+                                        borderRadius: '3px',
+                                        margin: '0 auto 0 auto',
+                                    }} onChange={this.onFilter.bind(this, col.name) }/>
+                                </div>
+                            }
+                        </th>
+                    )
+                })}
+            </tr>
+            </thead>
+        );
     }
 
-    rowUnSelectedHandler(data) {
-        delete this.selectedData[data[this.primaryKey]];
+    createControlPanel() {
+        return (
+            <div style={{
+                height: '30px',
+                width: '100%'
+            }}>
+                <input type="number" min={1} value={this.state.itemsCountPerPage} style={{
+                    width: '50px'
+                }} onChange={(event) => {
+                    this.setState({itemsCountPerPage: event.target.value});
+                }}/>
+                <div className="btn-group" style={{
+                    height: '30px',
+                    width: 'calc(100% - 50px)'
+                }}>
+                    { this.props.controls }
+                </div>
+            </div>
+        );
     }
 
     getSelectedRecords() {
-        const data = this.selectedData;
-        const toReturn = [];
-        for (let key in data)
-            if (data.hasOwnProperty(key))
-                toReturn.push(data[key]);
-        return toReturn
-    }
-
-    onRefreshClicked() {
-        console.log("Refresh Clicked...");
-        this.refresh();
-    }
-
-    onNewClicked() {
-        this.props.onNewClickedHandler();
-    }
-
-    onEditClicked() {
-        console.log("Edit Clicked");
-        const recs = this.getSelectedRecords();
-        if (recs.length !== 1) {
-            dataCache.warn("Please select one record to edit");
-        } else {
-            this.props.onDataEditHandler(recs[0]);
-        }
-    }
-
-    onAdvancedEditClicked() {
-        console.log("Advanced Edit Clicked");
-        const recs = this.getSelectedRecords();
-        if (recs.length !== 1) {
-            dataCache.warn("Please select one record to edit");
-        } else {
-            this.props.onDataAdvancedEditHandler(recs[0]);
-        }
-    }
-
-    onDeleteClicked() {
-        console.log("Delete Clicked...");
-        const callBack = (data) => {
-            this.refresh();
-        };
-        const recs = this.getSelectedRecords();
-        if (recs.length !== 1) {
-            dataCache.warn("Please select one record to edit");
-            return;
-        }
-        $.ajax({
-            type: "GET",
-            url: this.tableConfig.deletePath + recs[0][this.primaryKey],
-            dataType: 'json',
-            cache: false,
-            success: function (dt) {
-                if (dt.status) {
-                    dataCache.info(dt.message);
-                    callBack(recs[0]);
-                } else {
-                    dataCache.error(dt.message);
-                }
-            }.bind(this),
-            error: function (xhr, status, err) {
-                dataCache.serverError(xhr, status, err);
-            }.bind(this)
+        let _self = this;
+        return _self.state.displayData.filter(rec => {
+            let pkValue = rec[_self.primaryKey];
+            return _self.state.selectedData[pkValue] || false;
         });
     }
 
+    invalidateCache() {
+        let hasCrit = (Object.keys(this.criteria).length > 0);
+        let filteredData = hasCrit ? this.filterData(this.criteria) : this.rawData;
+        let sortBy = this.state.sortBy;
+        let sortDir = this.state.sortDir;
+        if (sortBy) {
+            filteredData = this.sortData([...filteredData], sortBy, sortDir)
+        }
+        this.setState({displayData: filteredData});
+    }
+
+    setNewRecords(data) {
+        console.debug("Setting new Records...", data);
+        this.rawData = data;
+        this.invalidateCache();
+    }
+
+    addRecord(data) {
+        console.debug("Adding new Record...", data);
+        this.rawData.push(data);
+        this.invalidateCache();
+    }
+
+    editRecord(data) {
+        console.log("Edit Record..", data);
+        this.rawData = this.rawData.filter(rec => rec[this.primaryKey] !== data[this.primaryKey]);
+        this.rawData.push(data);
+        this.invalidateCache();
+    }
+
+    deleteRecord(data) {
+        console.log("Delete Record...", data);
+        this.rawData = this.rawData.filter(rec => rec[this.primaryKey] !== data[this.primaryKey]);
+        this.invalidateCache();
+    }
+
     render() {
-        const displayData = this.getDisplayData();
+        const displayData = this.getPagedData();
+        const selectedData = this.state.selectedData;
         return (
             <div className="panel panel-default " style={{
                 margin: 0,
@@ -222,104 +301,28 @@ export default class ListGrid extends React.Component {
                     width: '100%',
                     padding: '5px'
                 }}>
-                    <div style={{
-                        height: '30px',
-                        width: '100%'
-                    }}>
-                        <input type="number" min={1} value={this.state.itemsCountPerPage} style={{
-                            width: '50px'
-                        }} onChange={(event) => {
-                            this.setState({itemsCountPerPage: event.target.value});
-                        }}/>
-                        <div className="btn-group" style={{
-                            height: '30px',
-                            width: 'calc(100% - 50px)'
-                        }}>
-
-                            {
-                                <button type="button" className="btn btn-default btn-sm"
-                                        onClick={this.onRefreshClicked.bind(this)}>
-                                    <span className="glyphicon glyphicon-refresh"/>
-                                    &nbsp;Refresh
-                                </button>
-                            }
-                            { this.props.onNewClickedHandler &&
-                            <button type="button" className="btn btn-default btn-sm"
-                                    onClick={this.onNewClicked.bind(this)}>
-                                <span className="glyphicon glyphicon-plus"/>
-                                &nbsp;New
-                            </button>
-                            }
-                            {this.props.onDataEditHandler &&
-                            <button type="button" className="btn btn-default btn-sm"
-                                    onClick={this.onEditClicked.bind(this)}>
-                                <span className="glyphicon glyphicon-pencil"/>
-                                &nbsp;Edit
-                            </button>
-                            }
-                            {this.props.onDataAdvancedEditHandler &&
-                            <button type="button" className="btn btn-default btn-sm"
-                                    onClick={this.onAdvancedEditClicked.bind(this)}>
-                                <span className="glyphicon glyphicon-pencil"/>
-                                &nbsp;{this.props.extraButton}
-                            </button>
-                            }
-                            {this.tableConfig.deletePath &&
-                            <button type="button" className="btn btn-default btn-sm"
-                                    onClick={this.onDeleteClicked.bind(this)}>
-                                <span className="glyphicon glyphicon-trash"/>
-                                &nbsp;Delete
-                            </button>
-                            }
-                        </div>
-                    </div>
-
+                    {this.createControlPanel()}
                     <div style={{
                         height: 'calc(100% - 30px)',
-                        width: '100%'
+                        width: '100%',
+                        overflow: 'auto'
                     }}>
                         <table className="table table-striped table-condensed table-hover table-bordered" style={{
                             marginBottom: '0'
                         }}>
-                            <thead>
-                            <tr style={{
-                                background: '#ebebeb'
-                            }}>
-                                <th className="listgrid-check-box ">
-                                    <input type="checkbox"
-                                           onChange={this.handleRowsSelect.bind(this)}/></th>
-                                {this.columns.map((col) => {
-                                    let sortDirArrow = <span >&nbsp;&nbsp;</span>;
-                                    if (this.state.sortBy === col.name && this.state.sortDir !== null) {
-                                        sortDirArrow = this.state.sortDir === 'DESC'
-                                            ? <span className="glyphicon glyphicon-arrow-down"/>
-                                            : <span className="glyphicon glyphicon-arrow-up"/>;
-                                    }
-                                    return <th key={col.name} className="listgrid-body-cell">
-                            <span
-                                style={{
-                                    width: 100
-                                }}
-                                onClick={() => this.onSort(col.name)}
-                            >{col.title }{sortDirArrow}</span>
-                                        <div>
-                                            <input className="listgrid-filter-item"
-                                                   onChange={this.onFilter.bind(this, col.name) }/>
-                                        </div>
-                                    </th>
-                                })}
-                            </tr>
-                            </thead>
-                            <tbody>
+                            {this.createTableHead()}
+                            <tbody style={{...styles.thead_tbody_tr,...styles.tbody}}>
                             {displayData.map((data) => {
+                                let pkValue = data[this.primaryKey];
                                 return (
                                     <Row
-                                        key={data[this.primaryKey]}
+                                        key={pkValue}
                                         primaryKey={this.primaryKey}
                                         columns={this.columns}
-                                        isRowsSelected={this.state.isRowsSelected}
-                                        rowSelectedHandler={this.rowSelectedHandler.bind(this)}
-                                        rowUnSelectedHandler={this.rowUnSelectedHandler.bind(this)}
+                                        isSelected={selectedData[pkValue]}
+                                        onSelectOneRow={(select) => {
+                                            this.onSelectOneRow(select, pkValue)
+                                        }}
                                         data={data}
                                     />
                                 )
@@ -349,49 +352,43 @@ export default class ListGrid extends React.Component {
 class Row extends React.Component {
     constructor(props) {
         super(props);
+        let selected = (typeof props.isSelected == 'undefined') ? false : props.isSelected;
         this.state = {
-            isSelected: false
+            isSelected: selected
         };
-        this.localUpdate = true;
     }
 
     handleRowClick(event) {
-        this.localUpdate = true;
-        this.onRowSelectionStateChange(!this.state.isSelected, this.props.data);
-        this.setState({isSelected: !this.state.isSelected});
-
+        let newValue = !this.state.isSelected;
+        this.setState({isSelected: newValue});
+        this.props.onSelectOneRow(newValue);
     }
 
-    onRowSelectionStateChange(selected, rowData) {
-        if (selected) {
-            this.props.rowSelectedHandler && this.props.rowSelectedHandler(rowData);
-        } else {
-            this.props.rowUnSelectedHandler && this.props.rowUnSelectedHandler(rowData);
+    componentWillReceiveProps(props) {
+        let oldState = (typeof this.state.isSelected == 'undefined') ? false : this.state.isSelected;
+        let newState = (typeof props.isSelected == 'undefined') ? false : props.isSelected;
+        if (oldState != newState) {
+            this.setState({isSelected: newState});
         }
     }
 
     render() {
-        //Respect loacal Updates
-        const selected = this.localUpdate ? this.state.isSelected : this.props.isRowsSelected;
-        this.state.isSelected = selected;
-        this.localUpdate = false;
+        const selected = this.props.isSelected;
+        const selectionStyle = selected ? styles.rowSelected : {};
         return (
-            <tr
+            <tr style={styles.thead_tbody_tr}
                 key={this.props.data[this.props.primaryKey]}
                 onClick={this.handleRowClick.bind(this)}
             >
-                <td
-                    className={"listgrid-check-box listgrid-body-cell " + (selected ? "listgrid-row-selected" : "") }
-                ><CheckBox
-                    onClick={this.handleRowClick.bind(this)}
-                    checked={selected}
-                /></td>
+                <td style={{...styles.checkBox, ...selectionStyle}}>
+                    <CheckBox selected={selected} onValueChanged={this.props.onSelectOneRow}/>
+                </td>
                 {this.props.columns.map((col) => {
-                    return <td
-                        key={col.name}
-                        className={"listgrid-body-cell " + (selected ? "listgrid-row-selected" : "")}
-                    >{this.props.data[col.name]}
-                    </td>
+                    return (
+                        <td key={col.name} style={selectionStyle}>
+                            {this.props.data[col.name]}
+                        </td>
+                    )
                 })}
             </tr>
         );
@@ -399,18 +396,31 @@ class Row extends React.Component {
 }
 
 class CheckBox extends React.Component {
-    render() {
-        if (this.props.checked)
-            return <input
-                type="checkbox" onChange={this.props.onChange}
-                checked="true" defaultValue="Hello!"
-            />;
-        else
-            return <input
-                type="checkbox" onChange={this.props.onChange}
-                defaultValue="Hello!"
-            />;
+    constructor(props) {
+        super(props);
+        this.state = {value: this.props.selected}
     }
+
+    componentWillReceiveProps(props) {
+        let oldState = (typeof this.state.value == 'undefined') ? false : this.state.value;
+        let newState = (typeof props.selected == 'undefined') ? false : props.selected;
+        if (oldState != newState) {
+            this.setState({value: newState});
+        }
+    }
+
+    render() {
+        //console.log('Render CheckBox', {s: this.state.value, p: this.props.selected});
+        return (
+            <input type="checkbox" checked={this.state.value} onChange={
+                (event) => {
+                    let newValue = !this.state.value;
+                    this.setState({value: newValue});
+                    this.props.onValueChanged(newValue);
+                }}
+            />
+        )
+    };
 }
 
 class Pager extends React.Component {

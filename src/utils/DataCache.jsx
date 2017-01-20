@@ -57,28 +57,6 @@ class DataCache {
              */
         ];
     }
-
-    getSrollbarWidth() {
-        let measure = {
-            width: '100px',
-            height: '100px',
-            overflow: 'scroll',
-            position: 'absolute',
-            top: '-9999px',
-        };
-        // Create the measurement node
-        let scrollDiv = document.createElement("div");
-        scrollDiv.className = "scrollbar-measure";
-        document.body.appendChild(scrollDiv);
-
-        // Get the scrollbar width
-        let scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
-        alert(scrollbarWidth);
-
-        // Delete the DIV
-        document.body.removeChild(scrollDiv);
-        return scrollbarWidth;
-    }
 }
 const DATA = new DataCache();
 export default DATA;

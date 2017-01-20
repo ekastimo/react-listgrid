@@ -1,29 +1,6 @@
-tbody {
-    display:block;
-    height:200px;
-    overflow:auto;
-}
-thead, tbody tr {
-    display:table;
-    width:100%;
-    table-layout:fixed;
-
-}
-thead {
-    width: calc( 100% - 17px );
-    overflow:scroll;
-}
 
 .pagination{
     margin: 0;
     float: right;
 }
 
-/* way the hell off screen */
-.scrollbar-measure {
-    width: 100px;
-    height: 100px;
-    overflow: scroll;
-    position: absolute;
-    top: -9999px;
-}
