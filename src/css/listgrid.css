@@ -1,25 +1,29 @@
-.listgrid-row-selected{
-    background-color: #ddd1e7;
-    border-bottom: 1px solid #ccbadc;
+tbody {
+    display:block;
+    height:200px;
+    overflow:auto;
 }
+thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
 
-.listgrid-check-box{
-    width: 40px;
 }
-
-.listgrid-filter-item{
-    width: 90%;
-    height: 20px;
-    border-radius: 3px;
-}
-
-.listgrid-filter-item{
-    width: 90%;
-    height: 20px;
-    border-radius: 3px;
+thead {
+    width: calc( 100% - 17px );
+    overflow:scroll;
 }
 
 .pagination{
     margin: 0;
     float: right;
+}
+
+/* way the hell off screen */
+.scrollbar-measure {
+    width: 100px;
+    height: 100px;
+    overflow: scroll;
+    position: absolute;
+    top: -9999px;
 }
