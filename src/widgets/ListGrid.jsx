@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from "react-dom";
 import Pagination from "react-js-pagination";
 
 const getScrollBarWidth = function () {
@@ -30,13 +31,23 @@ const styles = {
         tableLayout: 'fixed'
     },
     thead: {
-        width: 'calc( 100% - '+scrollBarW+'px )',
-        overflow: 'scroll'
+        width: 'calc( 100% - ' + scrollBarW + 'px )',
+        overflow: 'scroll',
+        border:'none'
     },
     tbody: {
         display: 'block',
-        height: '200px',
+        height: 'calc( 100% - 50px )',
         overflowY: 'scroll'
+    },
+    thead_tr: {
+
+    },
+    td: {
+        borderTop: 'none'
+    },
+    thead_td: {
+        borderRight: 'none'
     }
 };
 
@@ -56,6 +67,7 @@ export default class ListGrid extends React.Component {
          */
         this.criteria = {};
         this.isPaged = this.props.isPaged || false;
+        this.footerHeight = this.isPaged ? 40 : 0;
         this.state = {
             itemsCountPerPage: 10,
             allRowsSelected: false,
@@ -64,7 +76,8 @@ export default class ListGrid extends React.Component {
             sortDir: "ASC",//ASC/DESC
             sortBy: this.primaryKey,
             currentPage: 1,
-            showFilter: true
+            showFilter: true,
+            tableHeight: 200
         };
     }
 
@@ -180,9 +193,9 @@ export default class ListGrid extends React.Component {
 
     createTableHead() {
         return (
-            <thead style={{...styles.thead_tbody_tr,...styles.thead}}>
+            <thead style={{...styles.thead_tbody_tr, ...styles.thead}} ref="xxtableHead">
             <tr style={{
-                ...styles.thead_tbody_tr,
+                ...styles.thead_tbody_tr, ...styles.thead_tr,
                 background: '#ebebeb'
             }}>
 
@@ -198,7 +211,7 @@ export default class ListGrid extends React.Component {
                             : <span className="glyphicon glyphicon-arrow-up"/>;
                     }
                     return (
-                        <th key={col.name} className="listgrid-body-cell">
+                        <th key={col.name} style={styles.thead_td}>
                                 <span style={{width: 100}} onClick={() => this.onSort(col.name)}>
                                     {col.title }{sortDirArrow}
                                 </span>
@@ -286,6 +299,31 @@ export default class ListGrid extends React.Component {
         this.invalidateCache();
     }
 
+
+    updateDimensions() {
+
+        var node = ReactDOM.findDOMNode(this.refs["myTable"]);
+        var head = ReactDOM.findDOMNode(this.refs["xxtableHead"]);
+        if (node && head) {
+            var tableHeight = node.clientHeight;
+            var headHeight = head.clientHeight;
+            console.debug("Height is >>>> " + tableHeight + " >>> " + headHeight);
+            this.setState({tableHeight: (tableHeight - headHeight)});
+        } else {
+            alert("didntFindNode.....")
+        }
+
+    }
+
+    componentDidMount() {
+        this.updateDimensions();
+        window.addEventListener("resize", this.updateDimensions.bind(this));
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.updateDimensions.bind(this));
+    }
+
     render() {
         const displayData = this.getPagedData();
         const selectedData = this.state.selectedData;
@@ -297,7 +335,7 @@ export default class ListGrid extends React.Component {
             }}>
                 <div className="panel-body " style={{
                     margin: '0',
-                    height: 'calc(100% - 40px)',
+                    height: 'calc(100% - ' + this.footerHeight + 'px)',
                     width: '100%',
                     padding: '5px'
                 }}>
@@ -305,13 +343,15 @@ export default class ListGrid extends React.Component {
                     <div style={{
                         height: 'calc(100% - 30px)',
                         width: '100%',
-                        overflow: 'auto'
-                    }}>
-                        <table className="table table-striped table-condensed table-hover table-bordered" style={{
-                            marginBottom: '0'
-                        }}>
+                    }} ref="myTable">
+                        <table className="table table-striped table-condensed table-hover table-bordered"
+                               style={{
+                                   marginBottom: '0',
+                                   height: '100%'
+                               }}
+                        >
                             {this.createTableHead()}
-                            <tbody style={{...styles.thead_tbody_tr,...styles.tbody}}>
+                            <tbody style={{...styles.thead_tbody_tr, ...styles.tbody, height: this.state.tableHeight}}>
                             {displayData.map((data) => {
                                 let pkValue = data[this.primaryKey];
                                 return (
@@ -331,9 +371,10 @@ export default class ListGrid extends React.Component {
                         </table>
                     </div>
                 </div>
+                {   this.isPaged &&
                 <div className="panel-footer " style={{
                     margin: 0,
-                    height: '40px',
+                    height: this.footerHeight + 'px',
                     padding: "5px",
                 }}>
                     <Pager
@@ -343,6 +384,8 @@ export default class ListGrid extends React.Component {
                         changeHandler={this.onPagerChanged.bind(this)}
                     />
                 </div>
+                }
+
             </div>
 
         );
@@ -376,16 +419,16 @@ class Row extends React.Component {
         const selected = this.props.isSelected;
         const selectionStyle = selected ? styles.rowSelected : {};
         return (
-            <tr style={styles.thead_tbody_tr}
+            <tr style={{...styles.thead_tbody_tr}}
                 key={this.props.data[this.props.primaryKey]}
                 onClick={this.handleRowClick.bind(this)}
             >
-                <td style={{...styles.checkBox, ...selectionStyle}}>
+                <td style={{...styles.checkBox, ...selectionStyle, ...styles.td}}>
                     <CheckBox selected={selected} onValueChanged={this.props.onSelectOneRow}/>
                 </td>
                 {this.props.columns.map((col) => {
                     return (
-                        <td key={col.name} style={selectionStyle}>
+                        <td key={col.name} style={{...selectionStyle, ...styles.td}}>
                             {this.props.data[col.name]}
                         </td>
                     )
