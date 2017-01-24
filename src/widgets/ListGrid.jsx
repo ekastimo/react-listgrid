@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from "react-dom";
+import {findDOMNode} from "react-dom";
 import Pagination from "react-js-pagination";
 
 const getScrollBarWidth = function () {
@@ -302,8 +302,8 @@ export default class ListGrid extends React.Component {
 
     updateDimensions() {
 
-        var node = ReactDOM.findDOMNode(this.refs["myTable"]);
-        var head = ReactDOM.findDOMNode(this.refs["xxtableHead"]);
+        var node = findDOMNode(this.refs["myTable"]);
+        var head = findDOMNode(this.refs["xxtableHead"]);
         if (node && head) {
             var tableHeight = node.clientHeight;
             var headHeight = head.clientHeight;

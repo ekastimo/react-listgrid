@@ -1,9 +1,8 @@
 import React from "react";
 import {render} from "react-dom";
 import "bootstrap/dist/css/bootstrap.css";
-import "../css/listgrid.css";
-import ListGrid from "./ListGrid.jsx"
-import DATA from "../utils/DataCache.jsx"
+import ListGrid from "../widgets/ListGrid.jsx"
+import DATA from "./DataCache.jsx"
 export default class TestApp extends React.Component {
     constructor(props) {
         super(props);

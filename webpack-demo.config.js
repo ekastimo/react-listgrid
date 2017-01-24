@@ -1,33 +1,20 @@
 "use strict";
 
 const webpack = require('webpack');
-const env = require('yargs').argv.mode;
+var env = require('yargs').argv.mode;
 console.log("Environment", env);
-const debug = (env === 'dev');
-const libraryName = 'ListGrid';
-let outputFile;
-
-if (env === 'build') {
-    outputFile = libraryName + '.min.js';
-} else {
-    outputFile = libraryName + '.js';
-}
-
+var debug = true;
 
 module.exports = {
     devServer: {
         inline: true,
         port: 8000
     },
-    entry: './src/widgets/ListGrid.jsx',
+    entry: './src/demo/index.jsx',
     devtool: 'source-map',
-    output: {
-        path: "./dist/",
-        filename: outputFile,
-        library: libraryName,
-        libraryTarget: 'umd',
-        umdNamedDefine: true
-    },
+    output:
+        {path: "./dev/", publicPath: "/assets/", filename: 'app.bundle.js'}
+       ,
     module: {
         loaders: [
             {

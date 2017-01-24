@@ -1,6 +1,6 @@
 import React from "react";
 import {render} from "react-dom";
-import TestApp from "./widgets/TestApp.jsx"
+import TestApp from "./TestApp.jsx"
 class Index extends React.Component {
     render() {
         return (
