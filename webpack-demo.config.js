@@ -1,9 +1,9 @@
 "use strict";
 
 const webpack = require('webpack');
-var env = require('yargs').argv.mode;
-console.log("Environment", env);
-var debug = true;
+const env = require('yargs').argv.mode;
+console.log("Environment: ", env);
+const debug = (env === 'dev');
 
 module.exports = {
     devServer: {

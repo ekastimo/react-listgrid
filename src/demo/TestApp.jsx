@@ -87,6 +87,7 @@ export default class TestApp extends React.Component {
                     config={this.state.tableConfig}
                     data={this.state.tableData}
                     controls={this.createButtons()}
+                    isPaged={true}
                     ref={(_grid) => {
                         this.dataGrid = _grid;
                     }}

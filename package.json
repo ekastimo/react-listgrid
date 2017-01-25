@@ -1,6 +1,6 @@
 {
   "name": "react-listgrid",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "List Grid in React",
   "main": "dist/ListGrid.js",
   "repository": {
@@ -24,8 +24,9 @@
   },
   "scripts": {
     "build": "webpack --mode=build",
-    "dev": "webpack --progress --colors --watch --mode=dev",
-    "demo": "webpack-dev-server --config webpack-demo.config.js",
+    "dev": "webpack --progress --colors --mode=dev",
+    "demo": "webpack-dev-server --config webpack-demo.config.js --mode=dev",
+    "demo-prod": "webpack-dev-server --config webpack-demo.config.js --mode=prod",
     "test": "mocha --compilers js:babel-core/register --colors ./test/*.spec.js",
     "test:watch": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js"
   },
@@ -34,7 +35,8 @@
   },
   "peerDependencies": {
     "react": "~0.14.8 || ^15.0.0",
-    "react-dom": "~0.14.8 || ^15.0.0"
+    "react-dom": "~0.14.8 || ^15.0.0",
+    "react-js-pagination": "^2.0.2"
   },
   "devDependencies": {
     "babel-cli": "^6.22.2",

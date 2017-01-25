@@ -33,22 +33,38 @@ const styles = {
     thead: {
         width: 'calc( 100% - ' + scrollBarW + 'px )',
         overflow: 'scroll',
-        border:'none'
+        border: 'none'
     },
     tbody: {
         display: 'block',
         height: 'calc( 100% - 50px )',
         overflowY: 'scroll'
     },
-    thead_tr: {
-
-    },
+    thead_tr: {},
     td: {
         borderTop: 'none'
     },
     thead_td: {
         borderRight: 'none'
     }
+};
+
+const createPagnationClass = function () {
+    let styleName = 'customPagenationStyle';
+    let styleElement = document.getElementById(styleName);
+    if (styleElement)
+        document.getElementsByTagName('head')[0].removeChild(styleElement);
+    styleElement = document.createElement('style');
+    styleElement.type = 'text/css';
+    styleElement.id = styleName;
+    styleElement.innerHTML = `
+        .customPagenationStyle{
+            float: right;
+            margin: 0;
+        }
+    `;
+    document.getElementsByTagName('head')[0].appendChild(styleElement);
+
 };
 
 export default class ListGrid extends React.Component {
@@ -60,6 +76,7 @@ export default class ListGrid extends React.Component {
         this.columns = this.tableConfig.columns.filter((col) => {
             return col.showOnGrid
         });
+        createPagnationClass();
         //Local to List grid
         /**
          * Store Ids of the selected Data
@@ -79,6 +96,9 @@ export default class ListGrid extends React.Component {
             showFilter: true,
             tableHeight: 200
         };
+        //Refs
+        this.myTable = undefined;
+        this.tableHead = undefined;
     }
 
     componentWillReceiveProps(props) {
@@ -110,7 +130,7 @@ export default class ListGrid extends React.Component {
 
 
     sortData(rows, sortBy, sortDir) {
-        console.log("Sorting...", sortBy + " " + sortDir);
+        console.debug("Sorting...", sortBy + " " + sortDir);
         rows.sort((a, b) => {
             let sortVal = 0;
             if (a[sortBy] > b[sortBy]) {
@@ -145,7 +165,7 @@ export default class ListGrid extends React.Component {
     }
 
     filterData(criteria) {
-        console.log("Filtering..", criteria);
+        console.debug("Filtering..", criteria);
         const size = this.rawData.length;
         const filteredList = [];
         for (let index = 0; index < size; index++) {
@@ -165,7 +185,6 @@ export default class ListGrid extends React.Component {
     onFilter(colName, event) {
         const criteria = this.criteria;
         criteria[colName] = event.target.value.toString().toLowerCase();
-        const size = this.rawData.length;
         const filteredList = this.filterData(criteria);
         //On filter set Current Page to 1 lest records disappear
         this.setState({currentPage: 1, displayData: filteredList});
@@ -193,7 +212,9 @@ export default class ListGrid extends React.Component {
 
     createTableHead() {
         return (
-            <thead style={{...styles.thead_tbody_tr, ...styles.thead}} ref="xxtableHead">
+            <thead style={{...styles.thead_tbody_tr, ...styles.thead}} ref={(dv) => {
+                this.tableHead = dv;
+            }}>
             <tr style={{
                 ...styles.thead_tbody_tr, ...styles.thead_tr,
                 background: '#ebebeb'
@@ -287,27 +308,25 @@ export default class ListGrid extends React.Component {
     }
 
     editRecord(data) {
-        console.log("Edit Record..", data);
+        console.debug("Edit Record..", data);
         this.rawData = this.rawData.filter(rec => rec[this.primaryKey] !== data[this.primaryKey]);
         this.rawData.push(data);
         this.invalidateCache();
     }
 
     deleteRecord(data) {
-        console.log("Delete Record...", data);
+        console.debug("Delete Record...", data);
         this.rawData = this.rawData.filter(rec => rec[this.primaryKey] !== data[this.primaryKey]);
         this.invalidateCache();
     }
 
 
     updateDimensions() {
-
-        var node = findDOMNode(this.refs["myTable"]);
-        var head = findDOMNode(this.refs["xxtableHead"]);
+        let node = findDOMNode(this.myTable);
+        let head = findDOMNode(this.tableHead);
         if (node && head) {
-            var tableHeight = node.clientHeight;
-            var headHeight = head.clientHeight;
-            console.debug("Height is >>>> " + tableHeight + " >>> " + headHeight);
+            let tableHeight = node.clientHeight;
+            let headHeight = head.clientHeight;
             this.setState({tableHeight: (tableHeight - headHeight)});
         } else {
             alert("didntFindNode.....")
@@ -343,7 +362,9 @@ export default class ListGrid extends React.Component {
                     <div style={{
                         height: 'calc(100% - 30px)',
                         width: '100%',
-                    }} ref="myTable">
+                    }} ref={(dv) => {
+                        this.myTable = dv;
+                    }}>
                         <table className="table table-striped table-condensed table-hover table-bordered"
                                style={{
                                    marginBottom: '0',
@@ -453,7 +474,7 @@ class CheckBox extends React.Component {
     }
 
     render() {
-        //console.log('Render CheckBox', {s: this.state.value, p: this.props.selected});
+        //console.debug('Render CheckBox', {s: this.state.value, p: this.props.selected});
         return (
             <input type="checkbox" checked={this.state.value} onChange={
                 (event) => {
@@ -475,7 +496,7 @@ class Pager extends React.Component {
     }
 
     handlePageChange(pageNumber) {
-        console.log(`active page is ${pageNumber}`);
+        console.debug(`active page is ${pageNumber}`);
         this.setState({activePage: pageNumber});
         this.props.changeHandler(pageNumber);
     }
@@ -488,6 +509,7 @@ class Pager extends React.Component {
                 totalItemsCount={this.props.totalItemsCount}
                 pageRangeDisplayed={this.props.pageRangeDisplayed}
                 onChange={this.handlePageChange.bind(this)}
+                innerClass="pagination customPagenationStyle"
             />
         );
     }

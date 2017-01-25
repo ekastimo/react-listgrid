@@ -132,6 +132,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	};
 	
+	var createPagnationClass = function createPagnationClass() {
+	    var styleName = 'customPagenationStyle';
+	    var styleElement = document.getElementById(styleName);
+	    if (styleElement) document.getElementsByTagName('head')[0].removeChild(styleElement);
+	    styleElement = document.createElement('style');
+	    styleElement.type = 'text/css';
+	    styleElement.id = styleName;
+	    styleElement.innerHTML = "\n        .customPagenationStyle{\n            float: right;\n            margin: 0;\n        }\n    ";
+	    document.getElementsByTagName('head')[0].appendChild(styleElement);
+	};
+	
 	var ListGrid = function (_React$Component) {
 	    _inherits(ListGrid, _React$Component);
 	
@@ -146,6 +157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.columns = _this.tableConfig.columns.filter(function (col) {
 	            return col.showOnGrid;
 	        });
+	        createPagnationClass();
 	        //Local to List grid
 	        /**
 	         * Store Ids of the selected Data
@@ -165,6 +177,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            showFilter: true,
 	            tableHeight: 200
 	        };
+	        //Refs
+	        _this.myTable = undefined;
+	        _this.tableHead = undefined;
 	        return _this;
 	    }
 	
@@ -205,7 +220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: "sortData",
 	        value: function sortData(rows, sortBy, sortDir) {
-	            console.log("Sorting...", sortBy + " " + sortDir);
+	            console.debug("Sorting...", sortBy + " " + sortDir);
 	            rows.sort(function (a, b) {
 	                var sortVal = 0;
 	                if (a[sortBy] > b[sortBy]) {
@@ -246,7 +261,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function filterData(criteria) {
 	            var _this3 = this;
 	
-	            console.log("Filtering..", criteria);
+	            console.debug("Filtering..", criteria);
 	            var size = this.rawData.length;
 	            var filteredList = [];
 	
@@ -272,7 +287,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function onFilter(colName, event) {
 	            var criteria = this.criteria;
 	            criteria[colName] = event.target.value.toString().toLowerCase();
-	            var size = this.rawData.length;
 	            var filteredList = this.filterData(criteria);
 	            //On filter set Current Page to 1 lest records disappear
 	            this.setState({ currentPage: 1, displayData: filteredList });
@@ -306,7 +320,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return _react2.default.createElement(
 	                "thead",
-	                { style: _extends({}, styles.thead_tbody_tr, styles.thead), ref: "xxtableHead" },
+	                { style: _extends({}, styles.thead_tbody_tr, styles.thead), ref: function ref(dv) {
+	                        _this4.tableHead = dv;
+	                    } },
 	                _react2.default.createElement(
 	                    "tr",
 	                    { style: _extends({}, styles.thead_tbody_tr, styles.thead_tr, {
@@ -418,7 +434,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function editRecord(data) {
 	            var _this6 = this;
 	
-	            console.log("Edit Record..", data);
+	            console.debug("Edit Record..", data);
 	            this.rawData = this.rawData.filter(function (rec) {
 	                return rec[_this6.primaryKey] !== data[_this6.primaryKey];
 	            });
@@ -430,7 +446,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function deleteRecord(data) {
 	            var _this7 = this;
 	
-	            console.log("Delete Record...", data);
+	            console.debug("Delete Record...", data);
 	            this.rawData = this.rawData.filter(function (rec) {
 	                return rec[_this7.primaryKey] !== data[_this7.primaryKey];
 	            });
@@ -439,13 +455,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: "updateDimensions",
 	        value: function updateDimensions() {
-	
-	            var node = (0, _reactDom.findDOMNode)(this.refs["myTable"]);
-	            var head = (0, _reactDom.findDOMNode)(this.refs["xxtableHead"]);
+	            var node = (0, _reactDom.findDOMNode)(this.myTable);
+	            var head = (0, _reactDom.findDOMNode)(this.tableHead);
 	            if (node && head) {
 	                var tableHeight = node.clientHeight;
 	                var headHeight = head.clientHeight;
-	                console.debug("Height is >>>> " + tableHeight + " >>> " + headHeight);
 	                this.setState({ tableHeight: tableHeight - headHeight });
 	            } else {
 	                alert("didntFindNode.....");
@@ -490,7 +504,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        { style: {
 	                                height: 'calc(100% - 30px)',
 	                                width: '100%'
-	                            }, ref: "myTable" },
+	                            }, ref: function ref(dv) {
+	                                _this8.myTable = dv;
+	                            } },
 	                        _react2.default.createElement(
 	                            "table",
 	                            { className: "table table-striped table-condensed table-hover table-bordered",
@@ -632,7 +648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function render() {
 	            var _this12 = this;
 	
-	            //console.log('Render CheckBox', {s: this.state.value, p: this.props.selected});
+	            //console.debug('Render CheckBox', {s: this.state.value, p: this.props.selected});
 	            return _react2.default.createElement("input", { type: "checkbox", checked: this.state.value, onChange: function onChange(event) {
 	                    var newValue = !_this12.state.value;
 	                    _this12.setState({ value: newValue });
@@ -662,7 +678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(Pager, [{
 	        key: "handlePageChange",
 	        value: function handlePageChange(pageNumber) {
-	            console.log("active page is " + pageNumber);
+	            console.debug("active page is " + pageNumber);
 	            this.setState({ activePage: pageNumber });
 	            this.props.changeHandler(pageNumber);
 	        }
@@ -674,7 +690,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                itemsCountPerPage: this.props.itemsCountPerPage,
 	                totalItemsCount: this.props.totalItemsCount,
 	                pageRangeDisplayed: this.props.pageRangeDisplayed,
-	                onChange: this.handlePageChange.bind(this)
+	                onChange: this.handlePageChange.bind(this),
+	                innerClass: "pagination customPagenationStyle"
 	            });
 	        }
 	    }]);
